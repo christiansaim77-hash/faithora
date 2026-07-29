@@ -1,0 +1,5 @@
+/**
+ * FAITHORA Authentication Module
+ */
+
+export {};
