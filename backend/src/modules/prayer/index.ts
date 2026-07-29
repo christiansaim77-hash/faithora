@@ -1,0 +1,5 @@
+/**
+ * FAITHORA Prayer Module
+ */
+
+export {};
