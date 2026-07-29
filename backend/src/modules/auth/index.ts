@@ -1,5 +1,2 @@
-/**
- * FAITHORA Authentication Module
- */
-
-export {};
+import router from './routes';
+export default router;
