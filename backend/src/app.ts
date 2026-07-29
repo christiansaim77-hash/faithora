@@ -1,11 +1,23 @@
-import { authRoutes } from './modules/auth/routes';
-import { userRoutes } from './modules/users/routes';
-import { postRoutes } from './modules/posts/routes';
-import { prayerRoutes } from './modules/prayer/routes';
-import { bibleRoutes } from './modules/bible/routes';
-import { groupRoutes } from './modules/groups/routes';
+import express, { Request, Response, NextFunction } from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+
 import apiRouter from './routes/api';
-import { messagingRoutes } from './modules/messaging/routes';app.get('/api/v1/modules', (req, res) => {
+
+const app = express();
+
+// Security and parsing middleware
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+
+// Health endpoint
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+// Modules discovery (keeps previous behavior)
+app.get('/api/v1/modules', (req: Request, res: Response) => {
   res.json({
     modules: [
       'auth',
@@ -20,4 +32,24 @@ import { messagingRoutes } from './modules/messaging/routes';app.get('/api/v1/mo
   });
 });
 
+// Mount central API router
 app.use('/api/v1', apiRouter);
+
+// 404 handler
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  const err: any = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// Error handler
+app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || 500;
+  res.status(status).json({
+    error: {
+      message: err.message || 'Internal Server Error'
+    }
+  });
+});
+
+export default app;
